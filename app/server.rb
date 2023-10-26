@@ -1,6 +1,7 @@
 require "socket"
 
 class YourRedisServer
+  MAXIMUM_DATA_RECEIVE = 4000
   def initialize(port)
     @port = port
   end
@@ -8,7 +9,11 @@ class YourRedisServer
   def start
     server = TCPServer.new(@port)
     client = server.accept
-    client.puts response
+    loop do
+      client.recv(MAXIMUM_DATA_RECEIVE)
+      client.puts response
+    end
+    client.close
   end
 
   private
